@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"maps"
+	"net"
 	"os"
 	"reflect"
 	"sort"
@@ -119,6 +120,9 @@ type Configuration struct {
 	IP string
 	// Port defines on which port the simulator runs
 	Port int `yaml:"port" json:"port"`
+	// BindAddress defines the local IP address the HTTP and gRPC listener binds
+	// to. Empty means all interfaces.
+	BindAddress string `yaml:"bind-address" json:"bind-address"`
 
 	// DisplayModelName defines the model name that will be shown in API responses
 	// If ServedModelNames are not set, it defaults to the value of Model
@@ -689,6 +693,10 @@ func (c *Configuration) validate() error {
 	}
 	if c.Port <= 0 {
 		return fmt.Errorf("invalid port '%d'", c.Port)
+	}
+	if c.BindAddress != "" && net.ParseIP(c.BindAddress) == nil {
+		return fmt.Errorf("invalid bind-address '%s', expected an IP address such as 127.0.0.1 "+
+			"(omit it to listen on all interfaces)", c.BindAddress)
 	}
 	if c.Latencies.InterTokenLatency < 0 {
 		return errors.New("inter token latency cannot be negative")

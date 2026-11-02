@@ -255,6 +255,8 @@ func ParseCommandParamsAndLoadConfig(eng Engine) (*Configuration, error) {
 	f := pflag.NewFlagSet("llm-d-inference-sim flags", pflag.ContinueOnError)
 
 	f.IntVar(&config.Port, "port", config.Port, "Port")
+	f.StringVar(&config.BindAddress, "bind-address", config.BindAddress,
+		"Local IP address the simulator listens on, default is all interfaces; set 127.0.0.1 for loopback only")
 	f.IntVar(&config.MaxRequestBodySizeMB, "max-request-body-size-mb", config.MaxRequestBodySizeMB, "Maximum allowed size of an HTTP request body in megabytes, must be between 1 and 512, default is 4 (matching the fasthttp built-in default)")
 	f.StringVar(&config.Model, "model", config.Model,
 		"Currently 'loaded' model, can also be given as the first argument (if omitted on the command line, "+ModelEnv+" may set the model; see docs)")

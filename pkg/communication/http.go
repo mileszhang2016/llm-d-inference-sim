@@ -55,11 +55,21 @@ const (
 )
 
 func (c *Communication) newListener() (net.Listener, error) {
-	listener, err := net.Listen("tcp4", fmt.Sprintf(":%d", c.runtime.Config().Port))
+	cfg := c.runtime.Config()
+	listener, err := net.Listen("tcp4", ListenAddress(cfg.BindAddress, cfg.Port))
 	if err != nil {
 		return nil, err
 	}
 	return listener, nil
+}
+
+// ListenAddress returns the address the HTTP and gRPC listener binds to: the
+// configured bind address when set, otherwise all interfaces.
+func ListenAddress(bindAddress string, port int) string {
+	if bindAddress == "" {
+		return fmt.Sprintf(":%d", port)
+	}
+	return net.JoinHostPort(bindAddress, strconv.Itoa(port))
 }
 
 // The routes of the two API families that frame an error their own way, rather
